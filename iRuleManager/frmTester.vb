@@ -77,12 +77,21 @@ Public Class frmTester
         Dim node As MyTreeNode = e.Node
 
         pg1.SelectedObject = node.BasicInfo
+        If node.Data IsNot Nothing Then
+            'dg1.DataSource = node.Data.ValueCollection
+            Dim dic As Dictionary(Of String, String) = node.Data
+            pg1.SelectedObject = dic.ToArray
+        End If
+
     End Sub
 
     Private Sub tv2_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tv2.AfterSelect
         Dim node As MyTreeNode = e.Node
         pg1.SelectedObject = node.BasicInfo
-        dg1.DataSource = node.Data
+        If node.Data IsNot Nothing Then
+            dg1.DataSource = node.Data.Values
+        End If
+
     End Sub
 
 

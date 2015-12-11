@@ -110,33 +110,26 @@ Namespace Manager
 #Region "Scanning Functions"
         '// Test version
         Public Sub ScanDeviceTree()
-            ScanDeviceTree("Main", "Landscape Pages", "Home", 4)
+            ScanDeviceTree("Main", "Landscape Pages", "Home", 4, False)
         End Sub
 
         '// flexible version
-        Public Sub ScanDeviceTree(panel As String, group As String, page As String, level As Integer)
+        Public Sub ScanDeviceTree(panel As String, group As String, page As String, level As Integer, bDoDeepScan As Boolean)
             Dim filters As iRuleScanFilter() = BuildScanFilters(panel, group, page, level)
-            ScanDeviceTree(filters)
+            ScanDeviceTree(bDoDeepScan, filters)
         End Sub
 
-        '// execution version
-        Public Sub ScanDeviceTree(filters As iRuleScanFilter())
+        '// execution version to scan a device Tree
+        Public Sub ScanDeviceTree(bDoDeepScan As Boolean, filters As iRuleScanFilter())
             '// collapse everything so we know our beginning state
             leftCollapseAll = FindActiveImageByTitleName(leftPanel, "Collapse All")
             leftCollapseAll.UIEvent("click")
-
+            bDoDeepScan = True '//TEMPORARY
             Dim leftBody = FindActiveDivByClassName(leftPanel, "irule-GwtPanelBody")
             leftTree = leftBody.Divs.Filter(Find.ByClass("gwt-Tree")).First
-            'Dim filters(3) As iRuleScanFilter
-            'filters(0) = New iRuleScanFilter(eTreeSearchOptions.RestrictToPanel, "Main")
-            'filters(1) = New iRuleScanFilter(eTreeSearchOptions.RestrictToGroup, "Landscape Pages")
-            'filters(2) = New iRuleScanFilter(eTreeSearchOptions.RestrictToPage, "Home")
-            'filters(3) = New iRuleScanFilter(eTreeSearchOptions.StopAtLevel, 4)
+            If bDoDeepScan Then SetLeftPanel(leftPanel)     '// need to set the reference for deep scans.
+            NodeTree = ParseTree(leftTree, New MyTreeNode("iRule Project"), 0, bDoDeepScan, filters)
 
-            NodeTree = ParseTree(leftTree, New MyTreeNode("iRule Project"), 0, filters)
-            'NodeTree = ParseTree(leftTree, New MyTreeNode("iRule Project"), 0,
-            '                     {New iRuleScanFilter(eTreeSearchOptions.RestrictToGroup, "Landscape Pages"),
-            '                     New iRuleScanFilter(eTreeSearchOptions.StopAtLevel, 3)})
             ProcessImageList(NodeTree, True)
         End Sub
 
@@ -166,7 +159,7 @@ Namespace Manager
 
             WidgetListByHash.Clear()
             WidgetListByName.Clear()
-            WidgetTree = ParseTree(rightTree, New MyTreeNode("LiveScan Widget Tree"), 0, filters)
+            WidgetTree = ParseTree(rightTree, New MyTreeNode("LiveScan Widget Tree"), 0, False, filters)
             ProcessImageList(WidgetTree, False)
             CleanupImageList()
 
@@ -286,6 +279,11 @@ Namespace Manager
                         Dim Msg As String = String.Format("Not Found ({0}) With name ({1}) ", node.BasicInfo.Type, node.BasicInfo.Name)
                         If WidgetListByHash.ContainsKey(hashKey) Then
                             node.BasicInfo.Type = WidgetListByHash(hashKey).Name
+                            If node.Data IsNot Nothing Then
+                                'Dim dic As Dictionary(Of String, String) = node.Data
+                                ' dic("itemType") = WidgetListByHash(hashKey).Name
+                                node.Data("itemType") = WidgetListByHash(hashKey).Name
+                            End If
                         End If
                         Debug.Print("{0} replaced With {1} that has Type {2}", Msg, node.BasicInfo.Type, WidgetListByHash.ContainsKey(hashKey))
                     End If

@@ -13,7 +13,14 @@ Namespace Manager
     End Enum
 
     Public Module iRuleParsingUtilities
+        Private _leftPanel As Div
+        Private _tableProps As Table
 
+        '// When we go deep, we need to set the Left Hand Panel
+        Public Sub SetLeftPanel(lhp As Div)
+            _leftPanel = lhp
+        End Sub
+        '// the basic info class
         <Serializable>
         Public Class IRuleBasicItemInfo
             Private _base64Data1 As String
@@ -33,6 +40,7 @@ Namespace Manager
             End Function
         End Class
 
+        '// a structure for managing ScanFilters
         Public Structure iRuleScanFilter
             Public Type As eTreeSearchOptions
             Public Value As String
@@ -43,24 +51,24 @@ Namespace Manager
         End Structure
 
         '// parent overload to deal with a collection of divs rather than a div
-        Public Function ParseTree(outerDivCol As ElementCollection, rootNode As MyTreeNode, filters As iRuleScanFilter()) As MyTreeNode
+        Public Function ParseTree(outerDivCol As ElementCollection, rootNode As MyTreeNode, bDoDeepScan As Boolean, filters As iRuleScanFilter()) As MyTreeNode
             For Each nodeDiv As Div In outerDivCol
-                rootNode = ParseTree(nodeDiv, rootNode, 1, filters)
+                rootNode = ParseTree(nodeDiv, rootNode, 1, bDoDeepScan, filters)
             Next
             Return rootNode
         End Function
 
-        '// generic function to parse an iRule Tree Structure
-        Public Function ParseTree(outerDiv As Div, rootNode As MyTreeNode, level As Integer, filters As iRuleScanFilter()) As MyTreeNode
+        '// the main (generic) function to parse an iRule Tree Structure
+        Public Function ParseTree(outerDiv As Div, rootNode As MyTreeNode, level As Integer, bDoDeepScan As Boolean, filters As iRuleScanFilter()) As MyTreeNode
             For Each nodeDiv As Div In outerDiv.ChildrenOfType(Of Div)
                 '// each nodeDiv (except, normally, the first) contain items in child elements.
                 If nodeDiv.Exists Then
                     '// valid node (normal has a table with this element and a div with children)
                     '// or a div with table, if no children.
                     If nodeDiv.Children.Count = 2 Then      'we have children
-                        rootNode = ParseTreeNodeWithChildren(nodeDiv, rootNode, level, filters)
+                        rootNode = ParseTreeNodeWithChildren(nodeDiv, rootNode, level, bDoDeepScan, filters)
                     ElseIf nodeDiv.Tables.Count > 0
-                        rootNode = ParseTreeNodeNoChildren(nodeDiv, rootNode, level, filters)
+                        rootNode = ParseTreeNodeNoChildren(nodeDiv, rootNode, level, bDoDeepScan, filters)
                     End If
                 End If
             Next
@@ -68,7 +76,8 @@ Namespace Manager
         End Function
 
         '// use this function when the node has children
-        Private Function ParseTreeNodeWithChildren(nodeDiv As Div, rootNode As MyTreeNode, level As Integer, filters As iRuleScanFilter()) As MyTreeNode
+        '// at some point to-do merge these two (with and without children)
+        Private Function ParseTreeNodeWithChildren(nodeDiv As Div, rootNode As MyTreeNode, level As Integer, bDoDeepScan As Boolean, filters As iRuleScanFilter()) As MyTreeNode
             '// typically looks like:
             '// child 0 : <table>..<td><img expand/contract></td><td><table><td><img icon></td><td>Label</td></table></td></table>
             '// child 1 : <div>..<children div(s)...</div> --> fo rfurther processing
@@ -76,7 +85,6 @@ Namespace Manager
 
             '// then a subtable contains the item icon in first cell and the item name in second cell
             '// unless it's childless
-
             Dim itemTable As Table = outerTable.TableCells(1).Tables(0)
             Dim itemInfo As IRuleBasicItemInfo = GetHighLevelItemInfo(itemTable, level)
 
@@ -87,28 +95,43 @@ Namespace Manager
             Dim expandContractImage As Image = outerTable.TableCells(0).Children(0)
             expandContractImage.UIEvent("mousedown")
 
-
             '// lets put all this in a node
             Dim newNode As MyTreeNode = AddNodeWithGUID(nodeDiv, rootNode, itemInfo, True)
+            '// now should we process the DeepScan?
+            If bDoDeepScan Then
+                If SelectPanelItem(itemTable) IsNot Nothing Then
+                    newNode.Data = ReadItemProperties(itemInfo)
+                End If
+            End If
+
+
+
             '// now it's time to attack the children, if any.
             If nodeDiv.Divs.Count > 0 Then
                 For Each childDiv In nodeDiv.ChildrenOfType(Of Div)
-                    ParseTree(childDiv, newNode, level + 1, filters)
+                    ParseTree(childDiv, newNode, level + 1, bDoDeepScan, filters)
                 Next
             End If
             Return rootNode
         End Function
 
         '// use this function when the node has no children
-        Private Function ParseTreeNodeNoChildren(nodeDiv As Div, rootNode As MyTreeNode, level As Integer, filters As iRuleScanFilter()) As MyTreeNode
+        Private Function ParseTreeNodeNoChildren(nodeDiv As Div, rootNode As MyTreeNode, level As Integer, bDoDeepScan As Boolean, filters As iRuleScanFilter()) As MyTreeNode
             Dim itemTable As Table = nodeDiv.Tables(0)
             Dim itemInfo As IRuleBasicItemInfo = GetHighLevelItemInfo(itemTable, level)
             If Not ProcessItemFurther(itemInfo, filters) Then Return rootNode
             '// lets put all this in a node
             Dim newNode As MyTreeNode = AddNodeWithGUID(nodeDiv, rootNode, itemInfo, True)
+            '// now should we process the DeepScan?
+            If bDoDeepScan Then
+                If SelectPanelItem(itemTable) IsNot Nothing Then
+                    newNode.Data = ReadItemProperties(itemInfo)
+                End If
+            End If
             Return rootNode
         End Function
 
+        '// using the filters, decide whether to process this item further
         Private Function ProcessItemFurther(itemInfo As IRuleBasicItemInfo, filters As iRuleScanFilter()) As Boolean
             '// if there are no filters, return true (i.e. process further)
             If filters Is Nothing Then Return True
@@ -201,6 +224,7 @@ Namespace Manager
 
             Return dest
         End Function
+
         '// Build the filters used to optimize Tree Scanning
         Public Function BuildScanFilters(panel As String, group As String, excludegroup As String, page As String, level As Integer) As iRuleScanFilter()
             Dim filters(-1) As iRuleScanFilter
@@ -264,10 +288,109 @@ Namespace Manager
             Return Nothing
         End Function
 
+        '// track down a Div that contains a text string
         Public Function FindDivContainingText(source As Div, targetText As String) As Div
             For Each tabDiv As Div In source.ChildrenOfType(Of Div)
                 If tabDiv.Text.Trim = targetText Then Return tabDiv
             Next
+            Return Nothing
+        End Function
+
+        '// Perform the deepScan and read an items Properties from the Property Table
+        Private Function ReadItemProperties(itemInfo As IRuleBasicItemInfo) As Dictionary(Of String, String)
+            '// long winded -- but only want to refresh tableProps if we have to.
+            If _tableProps IsNot Nothing Then
+                If _tableProps.Exists = False Then
+                    _tableProps = GetTableProps(_leftPanel)
+                End If
+            Else
+                _tableProps = GetTableProps(_leftPanel)
+            End If
+            Dim dicKeyValues As New Dictionary(Of String, String)
+            dicKeyValues.Add("itemName", itemInfo.Name)
+            dicKeyValues.Add("itemType", itemInfo.Type)
+            'lstKVP.Add(New KeyValuePair(Of String, String)("itemMacro", itemInfo.XtraInfo))
+            'lstKVP.Add(New KeyValuePair(Of String, String)("itemParentPanel", itemInfo.ParentPanel))
+            dicKeyValues.Add("itemID", itemInfo.GUID)
+
+            For Each tableRow As TableRow In _tableProps.TableRows
+                Dim nameCell = tableRow.TableCell(Find.ByClass("nameCell"))
+                Dim valueCell = tableRow.TableCell(Find.ByClass("valueCell"))
+                Dim nameDiv As Div = nameCell.Children(0)
+                '// inspect the div, because the div we want might be nested, one level down
+                If nameDiv.Children.Count > 0 Then
+                    nameDiv = nameDiv.Children(0)
+                End If
+                '// now get the name of the field
+                Dim fldName As String = nameDiv.InnerHtml
+                Dim fldValue As String = valueCell.Children(0).Title
+                If fldValue = "" Then
+                    fldValue = valueCell.Children(0).GetAttributeValue("value")
+                End If
+
+                dicKeyValues.Add(fldName, fldValue)
+            Next
+            Return dicKeyValues
+        End Function
+
+        Private Function ReadItemPropertiesOLD(itemInfo As IRuleBasicItemInfo) As List(Of KeyValuePair(Of String, String))
+            '// long winded -- but only want to refresh tableProps if we have to.
+            If _tableProps IsNot Nothing Then
+                If _tableProps.Exists = False Then
+                    _tableProps = GetTableProps(_leftPanel)
+                End If
+            Else
+                _tableProps = GetTableProps(_leftPanel)
+            End If
+            Dim lstKVP As New List(Of KeyValuePair(Of String, String))
+            lstKVP.Add(New KeyValuePair(Of String, String)("itemName", itemInfo.Name))
+            lstKVP.Add(New KeyValuePair(Of String, String)("itemType", itemInfo.Type))
+            'lstKVP.Add(New KeyValuePair(Of String, String)("itemMacro", itemInfo.XtraInfo))
+            'lstKVP.Add(New KeyValuePair(Of String, String)("itemParentPanel", itemInfo.ParentPanel))
+            lstKVP.Add(New KeyValuePair(Of String, String)("itemID", itemInfo.GUID))
+
+            For Each tableRow As TableRow In _tableProps.TableRows
+                Dim nameCell = tableRow.TableCell(Find.ByClass("nameCell"))
+                Dim valueCell = tableRow.TableCell(Find.ByClass("valueCell"))
+                Dim nameDiv As Div = nameCell.Children(0)
+                '// inspect the div, because the div we want might be nested, one level down
+                If nameDiv.Children.Count > 0 Then
+                    nameDiv = nameDiv.Children(0)
+                End If
+                '// now get the name of the field
+                Dim fldName As String = nameDiv.InnerHtml
+                Dim fldValue As String = valueCell.Children(0).Title
+                If fldValue = "" Then
+                    fldValue = valueCell.Children(0).GetAttributeValue("value")
+                End If
+                Dim kvp As New KeyValuePair(Of String, String)(fldName, fldValue)
+                lstKVP.Add(kvp)
+            Next
+            Return lstKVP
+        End Function
+        '// Get the properties table
+        Private Function GetTableProps(leftPanel As Div) As Table
+            For Each subDiv As Div In leftPanel.Children
+                If subDiv.Children.Count > 0 Then
+                    Dim sectionDiv As Div = subDiv.Children(0)
+                    If sectionDiv.ClassName = "irule-PropertiesManagerView" Then
+                        Return sectionDiv.Tables.Filter(Find.ByClass("irule-PropertiesItem")).First
+                    End If
+                End If
+            Next
+            Return Nothing
+        End Function
+
+        '// Click the DIV surrrounding the Tree Element
+        Private Function SelectPanelItem(itemTable As Table) As Div
+            If itemTable IsNot Nothing And itemTable.Exists Then
+                Dim panName As Div = itemTable.Divs.Filter(Find.ByClass("irule-TreeItemWithImage label")).First
+                If panName IsNot Nothing Then
+                    ''// CLICK THE ELEMENT
+                    panName.UIEvent("mousedown")
+                    Return panName
+                End If
+            End If
             Return Nothing
         End Function
     End Module
