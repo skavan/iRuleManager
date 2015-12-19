@@ -134,6 +134,7 @@ Public Class frmTester
         Dim node As MyTreeNode = e.Node
         If node.Data IsNot Nothing Then
             'dg1.DataSource = node.Data.ValueCollection
+            iRule.GoToElement(node)
             Dim dic As Dictionary(Of String, String) = node.Data
             pg1.SelectedObject = dic.ToArray
         End If

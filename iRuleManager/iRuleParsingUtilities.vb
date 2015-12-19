@@ -393,6 +393,24 @@ Namespace Manager
             End If
             Return Nothing
         End Function
+
+        Public Function FindElement(source As Div, id As String, doClick As Boolean) As Div
+            '// we need to find the element, 
+            '// we need a function to walk up the tree And open the page
+            Dim targetElement As Div = source.Div(id)
+            Dim targetTable As Table = targetElement.Tables(0)
+
+            If targetElement.Children.Count = 2 Then      'we have children so the actual table we wnat is further embedded.
+
+                targetTable = targetTable.TableCells(1).Tables(0)
+            Else
+                'targetTable = targetElement.Tables(0)
+
+            End If
+            SelectPanelItem(targetTable)     '// the actual item should be in the first table
+            'targetElement.UIEvent("mousedown")
+            Return targetElement
+        End Function
     End Module
 
 End Namespace

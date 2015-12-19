@@ -26,7 +26,7 @@ Namespace Manager
         Private WidgetListByName As New Dictionary(Of String, IRuleBasicItemInfo)
 
         Private leftPanel As Div = Nothing      '// The Div holding the tree section and properties section in the leftHand Panel
-        Private leftTree As Div = Nothing
+        Private leftTree As Div = Nothing       '// The Device tree
         Private tableProps As Table = Nothing
         Private leftCollapseAll As Image = Nothing
         'Private WidgetList As New List(Of String)
@@ -309,6 +309,10 @@ Namespace Manager
                     ProcessImageList(node, isLeftTree)
                 End If
             Next
+        End Sub
+
+        Public Sub GoToElement(node As MyTreeNode)
+            FindElement(leftTree, node.BasicInfo.GUID, True)
         End Sub
 
         Public Sub Cleanup()
