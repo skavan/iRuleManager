@@ -139,7 +139,7 @@ Namespace Manager
             For Each filter As iRuleScanFilter In filters
                 Select Case filter.Type
                     Case eTreeSearchOptions.ExcludeGroup
-                        If itemInfo.Level = 0 Then
+                        If itemInfo.Level = 1 Then
                             For Each value In filter.Value.Split("|")
                                 If itemInfo.Name = value Then Return False
                             Next
@@ -252,8 +252,8 @@ Namespace Manager
         End Function
 
         '// convenience overload
-        Public Function BuildScanFilters(excludegroup As String) As iRuleScanFilter()
-            Return BuildScanFilters("", "", excludegroup, "", 0)
+        Public Function BuildScanFilters(excludegroup As String, level As Integer) As iRuleScanFilter()
+            Return BuildScanFilters("", "", excludegroup, "", level)
         End Function
 
         '// Build the filters used to optimize Tree Scanning

@@ -24,7 +24,7 @@ Partial Class frmTester
     Private Sub InitializeComponent()
         Me.btnInit = New System.Windows.Forms.Button()
         Me.btnScan = New System.Windows.Forms.Button()
-        Me.tv1 = New System.Windows.Forms.TreeView()
+        Me.tvTree = New System.Windows.Forms.TreeView()
         Me.dg1 = New System.Windows.Forms.DataGridView()
         Me.pg1 = New System.Windows.Forms.PropertyGrid()
         Me.btnWriteWidgets = New System.Windows.Forms.Button()
@@ -34,12 +34,19 @@ Partial Class frmTester
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.tv3 = New System.Windows.Forms.TreeView()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.btnLoadPage = New System.Windows.Forms.Button()
         Me.btnReadWidgets = New System.Windows.Forms.Button()
+        Me.tbDeviceTree = New System.Windows.Forms.TabControl()
+        Me.tbPage1 = New System.Windows.Forms.TabPage()
+        Me.tbPage2 = New System.Windows.Forms.TabPage()
+        Me.tvPage = New System.Windows.Forms.TreeView()
         CType(Me.dg1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
+        Me.tbDeviceTree.SuspendLayout()
+        Me.tbPage1.SuspendLayout()
+        Me.tbPage2.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnInit
@@ -61,22 +68,23 @@ Partial Class frmTester
         Me.btnScan.Text = "ScanSystem"
         Me.btnScan.UseVisualStyleBackColor = True
         '
-        'tv1
+        'tvTree
         '
-        Me.tv1.Location = New System.Drawing.Point(12, 12)
-        Me.tv1.Name = "tv1"
-        Me.tv1.Size = New System.Drawing.Size(596, 509)
-        Me.tv1.TabIndex = 2
+        Me.tvTree.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvTree.Location = New System.Drawing.Point(3, 3)
+        Me.tvTree.Name = "tvTree"
+        Me.tvTree.Size = New System.Drawing.Size(580, 552)
+        Me.tvTree.TabIndex = 2
         '
         'dg1
         '
         Me.dg1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dg1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dg1.Location = New System.Drawing.Point(6, 370)
+        Me.dg1.Location = New System.Drawing.Point(6, 402)
         Me.dg1.Name = "dg1"
         Me.dg1.RowHeadersVisible = False
         Me.dg1.RowTemplate.Height = 28
-        Me.dg1.Size = New System.Drawing.Size(593, 445)
+        Me.dg1.Size = New System.Drawing.Size(593, 413)
         Me.dg1.TabIndex = 3
         '
         'pg1
@@ -85,7 +93,7 @@ Partial Class frmTester
         Me.pg1.HelpVisible = False
         Me.pg1.Location = New System.Drawing.Point(6, 6)
         Me.pg1.Name = "pg1"
-        Me.pg1.Size = New System.Drawing.Size(593, 361)
+        Me.pg1.Size = New System.Drawing.Size(593, 383)
         Me.pg1.TabIndex = 4
         Me.pg1.ToolbarVisible = False
         '
@@ -109,15 +117,15 @@ Partial Class frmTester
         '
         'tv2
         '
-        Me.tv2.Location = New System.Drawing.Point(12, 527)
+        Me.tv2.Location = New System.Drawing.Point(12, 609)
         Me.tv2.Name = "tv2"
-        Me.tv2.Size = New System.Drawing.Size(596, 497)
+        Me.tv2.Size = New System.Drawing.Size(596, 415)
         Me.tv2.TabIndex = 7
         '
         'TabControl1
         '
-        Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Location = New System.Drawing.Point(622, 178)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -151,17 +159,17 @@ Partial Class frmTester
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage2.Size = New System.Drawing.Size(596, 812)
         Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "TabPage2"
+        Me.TabPage2.Text = "Properties"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
-        'Button1
+        'btnLoadPage
         '
-        Me.Button1.Location = New System.Drawing.Point(1079, 12)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(147, 65)
-        Me.Button1.TabIndex = 9
-        Me.Button1.Text = "Load page"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.btnLoadPage.Location = New System.Drawing.Point(1079, 12)
+        Me.btnLoadPage.Name = "btnLoadPage"
+        Me.btnLoadPage.Size = New System.Drawing.Size(147, 65)
+        Me.btnLoadPage.TabIndex = 9
+        Me.btnLoadPage.Text = "Load page"
+        Me.btnLoadPage.UseVisualStyleBackColor = True
         '
         'btnReadWidgets
         '
@@ -172,18 +180,58 @@ Partial Class frmTester
         Me.btnReadWidgets.Text = "Read Widgets"
         Me.btnReadWidgets.UseVisualStyleBackColor = True
         '
+        'tbDeviceTree
+        '
+        Me.tbDeviceTree.Controls.Add(Me.tbPage1)
+        Me.tbDeviceTree.Controls.Add(Me.tbPage2)
+        Me.tbDeviceTree.Location = New System.Drawing.Point(12, 12)
+        Me.tbDeviceTree.Name = "tbDeviceTree"
+        Me.tbDeviceTree.SelectedIndex = 0
+        Me.tbDeviceTree.Size = New System.Drawing.Size(594, 591)
+        Me.tbDeviceTree.TabIndex = 11
+        '
+        'tbPage1
+        '
+        Me.tbPage1.Controls.Add(Me.tvTree)
+        Me.tbPage1.Location = New System.Drawing.Point(4, 29)
+        Me.tbPage1.Name = "tbPage1"
+        Me.tbPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.tbPage1.Size = New System.Drawing.Size(586, 558)
+        Me.tbPage1.TabIndex = 0
+        Me.tbPage1.Text = "Device Tree"
+        Me.tbPage1.UseVisualStyleBackColor = True
+        '
+        'tbPage2
+        '
+        Me.tbPage2.Controls.Add(Me.tvPage)
+        Me.tbPage2.Location = New System.Drawing.Point(4, 29)
+        Me.tbPage2.Name = "tbPage2"
+        Me.tbPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.tbPage2.Size = New System.Drawing.Size(586, 558)
+        Me.tbPage2.TabIndex = 1
+        Me.tbPage2.Text = "Selected Page"
+        Me.tbPage2.UseVisualStyleBackColor = True
+        '
+        'tvPage
+        '
+        Me.tvPage.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvPage.Location = New System.Drawing.Point(3, 3)
+        Me.tvPage.Name = "tvPage"
+        Me.tvPage.Size = New System.Drawing.Size(580, 552)
+        Me.tvPage.TabIndex = 3
+        '
         'frmTester
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1805, 1036)
+        Me.ClientSize = New System.Drawing.Size(1237, 1036)
+        Me.Controls.Add(Me.tbDeviceTree)
         Me.Controls.Add(Me.btnReadWidgets)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.btnLoadPage)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.tv2)
         Me.Controls.Add(Me.btnWidgets)
         Me.Controls.Add(Me.btnWriteWidgets)
-        Me.Controls.Add(Me.tv1)
         Me.Controls.Add(Me.btnScan)
         Me.Controls.Add(Me.btnInit)
         Me.Name = "frmTester"
@@ -192,13 +240,16 @@ Partial Class frmTester
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
+        Me.tbDeviceTree.ResumeLayout(False)
+        Me.tbPage1.ResumeLayout(False)
+        Me.tbPage2.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents btnInit As Button
     Friend WithEvents btnScan As Button
-    Friend WithEvents tv1 As TreeView
+    Friend WithEvents tvTree As TreeView
     Friend WithEvents dg1 As DataGridView
     Friend WithEvents pg1 As PropertyGrid
     Friend WithEvents btnWriteWidgets As Button
@@ -208,6 +259,10 @@ Partial Class frmTester
     Friend WithEvents TabPage1 As TabPage
     Friend WithEvents tv3 As TreeView
     Friend WithEvents TabPage2 As TabPage
-    Friend WithEvents Button1 As Button
+    Friend WithEvents btnLoadPage As Button
     Friend WithEvents btnReadWidgets As Button
+    Friend WithEvents tbDeviceTree As TabControl
+    Friend WithEvents tbPage1 As TabPage
+    Friend WithEvents tbPage2 As TabPage
+    Friend WithEvents tvPage As TreeView
 End Class

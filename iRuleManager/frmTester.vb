@@ -32,13 +32,13 @@ Public Class frmTester
     Private Sub btnScan_Click(sender As Object, e As EventArgs) Handles btnScan.Click
         ST.Start()
         ShowProgress("Scanning Device Tree...", False)
-        iRule.ScanDeviceTree()
+        iRule.ScanDeviceTree("Device Tree", "Entrances|Motions|Gestures", 3)
 
         If iRule.NodeTree IsNot Nothing Then
-            tv1.Nodes.Clear()
-            tv1.ImageList = iRule.imageList
-            tv1.Nodes.Add(iRule.NodeTree)
-            tv1.ExpandAll()
+            tvTree.Nodes.Clear()
+            tvTree.ImageList = iRule.imageList
+            tvTree.Nodes.Add(iRule.NodeTree)
+            tvTree.ExpandAll()
         End If
         ShowProgress("Scanning Device Tree...", True)
     End Sub
@@ -57,15 +57,10 @@ Public Class frmTester
 
     Private Sub btnWriteWidgets_Click(sender As Object, e As EventArgs) Handles btnWriteWidgets.Click
         iRule.WriteWidgetListsToFile()
-        'Dim node As MyTreeNode = tv1.SelectedNode
-        'iRule.ScanPage(node)
-        'tv2.Nodes.Clear()
-        'tv2.Nodes.Add(iRule.PageNodeTree)
-        'tv2.ExpandAll()
+
     End Sub
 
     Private Sub frmTester_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-
         If iRule IsNot Nothing Then
             iRule.Cleanup()
             iRule = Nothing
@@ -73,14 +68,14 @@ Public Class frmTester
 
     End Sub
 
-    Private Sub tv1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tv1.AfterSelect
+    Private Sub tvTree_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvTree.AfterSelect
         Dim node As MyTreeNode = e.Node
 
         pg1.SelectedObject = node.BasicInfo
         If node.Data IsNot Nothing Then
             'dg1.DataSource = node.Data.ValueCollection
             Dim dic As Dictionary(Of String, String) = node.Data
-            pg1.SelectedObject = dic.ToArray
+            'pg1.SelectedObject = dic.ToArray
         End If
 
     End Sub
@@ -94,11 +89,9 @@ Public Class frmTester
 
     End Sub
 
-
-
     Private Sub frmTester_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = 1200
-        tv1.ShowNodeToolTips = True
+        tvTree.ShowNodeToolTips = True
         tv2.ShowNodeToolTips = True
     End Sub
 
@@ -112,7 +105,37 @@ Public Class frmTester
         End If
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        pg1.SelectedObject = iRule.GetWidgetListByName
+    Private Sub btnLoadPage_Click(sender As Object, e As EventArgs) Handles btnLoadPage.Click
+
+        Dim node As MyTreeNode = tvTree.SelectedNode
+        If node.BasicInfo.Type = "Page" Then
+
+            Dim panel As String = DirectCast(node.Parent.Parent, MyTreeNode).BasicInfo.Name
+            Dim group As String = DirectCast(node.Parent, MyTreeNode).BasicInfo.Name
+            Dim page As String = node.BasicInfo.Name
+            Dim pagePath As String = panel & "\" & group & "\" & page
+            ShowProgress("Scanning " & pagePath, False)
+            iRule.ScanDeviceTree("Active Page", panel, group, page, 4, True)
+            If iRule.PageTree IsNot Nothing Then
+                tvPage.Nodes.Clear()
+                tvPage.ImageList = iRule.imageList
+                tvPage.Nodes.Add(iRule.PageTree)
+                tvPage.ExpandAll()
+                tbDeviceTree.SelectedTab = tbPage2
+            End If
+            ShowProgress("Scanning " & pagePath, True)
+        Else
+            MsgBox("You must Select a Page", MsgBoxStyle.Information)
+        End If
+        'pg1.SelectedObject = iRule.GetWidgetListByName
+    End Sub
+
+    Private Sub tvPage_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvPage.AfterSelect
+        Dim node As MyTreeNode = e.Node
+        If node.Data IsNot Nothing Then
+            'dg1.DataSource = node.Data.ValueCollection
+            Dim dic As Dictionary(Of String, String) = node.Data
+            pg1.SelectedObject = dic.ToArray
+        End If
     End Sub
 End Class

@@ -13,6 +13,7 @@ Namespace Manager
         Property ie As IE = Nothing
         Property AvailablePanels As New Dictionary(Of String, String)   '// ID and Panel Name
         Property NodeTree As MyTreeNode
+        Property PageTree As MyTreeNode
         Property PageNodeTree As MyTreeNode
         Property WidgetTree As MyTreeNode
         Property imageList As New ImageList
@@ -109,32 +110,47 @@ Namespace Manager
 
 #Region "Scanning Functions"
         '// Test version
-        Public Sub ScanDeviceTree()
-            ScanDeviceTree("Main", "Landscape Pages", "Home", 4, False)
+        Public Sub ScanDeviceTree(title As String)
+            'ScanDeviceTree("Main", "Landscape Pages", "Home", 4, False)
+            ScanDeviceTree(title, "", "", "", 3, False)
         End Sub
 
+        Public Sub ScanDeviceTree(title As String, excludeGroups As String, level As Integer)
+            'ScanDeviceTree("Main", "Landscape Pages", "Home", 4, False)
+            Dim filters As iRuleScanFilter() = BuildScanFilters(excludeGroups, 3)
+            ScanDeviceTree(title, False, filters)
+        End Sub
+
+
         '// flexible version
-        Public Sub ScanDeviceTree(panel As String, group As String, page As String, level As Integer, bDoDeepScan As Boolean)
+        Public Sub ScanDeviceTree(title As String, panel As String, group As String, page As String, level As Integer, bDoDeepScan As Boolean)
             Dim filters As iRuleScanFilter() = BuildScanFilters(panel, group, page, level)
-            ScanDeviceTree(bDoDeepScan, filters)
+            ScanDeviceTree(title, bDoDeepScan, filters)
         End Sub
 
         '// execution version to scan a device Tree
-        Public Sub ScanDeviceTree(bDoDeepScan As Boolean, filters As iRuleScanFilter())
+        Public Sub ScanDeviceTree(title As String, bDoDeepScan As Boolean, filters As iRuleScanFilter())
             '// collapse everything so we know our beginning state
             leftCollapseAll = FindActiveImageByTitleName(leftPanel, "Collapse All")
             leftCollapseAll.UIEvent("click")
-            bDoDeepScan = True '//TEMPORARY
+            '//bDoDeepScan = True '//TEMPORARY
             Dim leftBody = FindActiveDivByClassName(leftPanel, "irule-GwtPanelBody")
             leftTree = leftBody.Divs.Filter(Find.ByClass("gwt-Tree")).First
-            If bDoDeepScan Then SetLeftPanel(leftPanel)     '// need to set the reference for deep scans.
-            NodeTree = ParseTree(leftTree, New MyTreeNode("iRule Project"), 0, bDoDeepScan, filters)
+            If bDoDeepScan Then
+                SetLeftPanel(leftPanel)
+                PageTree = ParseTree(leftTree, New MyTreeNode(title), 0, bDoDeepScan, filters)
+                ProcessImageList(PageTree, True)
+            Else
+                NodeTree = ParseTree(leftTree, New MyTreeNode(title), 0, bDoDeepScan, filters)
+                ProcessImageList(NodeTree, True)
+            End If     '// need to set the reference for deep scans.
 
-            ProcessImageList(NodeTree, True)
+
+
         End Sub
 
         Public Sub ScanWidgetTree()
-            Dim filters As iRuleScanFilter() = BuildScanFilters("Modules|Conditionals")
+            Dim filters As iRuleScanFilter() = BuildScanFilters("Modules|Conditionals", 4)
             ScanWidgetTree(filters)
         End Sub
 
