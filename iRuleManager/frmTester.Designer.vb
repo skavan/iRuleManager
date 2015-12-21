@@ -29,7 +29,7 @@ Partial Class frmTester
         Me.pg1 = New System.Windows.Forms.PropertyGrid()
         Me.btnWriteWidgets = New System.Windows.Forms.Button()
         Me.btnWidgets = New System.Windows.Forms.Button()
-        Me.tv2 = New System.Windows.Forms.TreeView()
+        Me.tvWidgetList = New System.Windows.Forms.TreeView()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
@@ -84,11 +84,11 @@ Partial Class frmTester
         Me.dg1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dg1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dg1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.dg1.Location = New System.Drawing.Point(3, 482)
+        Me.dg1.Location = New System.Drawing.Point(3, 344)
         Me.dg1.Name = "dg1"
         Me.dg1.RowHeadersVisible = False
         Me.dg1.RowTemplate.Height = 28
-        Me.dg1.Size = New System.Drawing.Size(590, 245)
+        Me.dg1.Size = New System.Drawing.Size(590, 383)
         Me.dg1.TabIndex = 3
         '
         'pg1
@@ -98,7 +98,7 @@ Partial Class frmTester
         Me.pg1.HelpVisible = False
         Me.pg1.Location = New System.Drawing.Point(3, 3)
         Me.pg1.Name = "pg1"
-        Me.pg1.Size = New System.Drawing.Size(590, 473)
+        Me.pg1.Size = New System.Drawing.Size(590, 335)
         Me.pg1.TabIndex = 4
         Me.pg1.ToolbarVisible = False
         '
@@ -120,12 +120,12 @@ Partial Class frmTester
         Me.btnWidgets.Text = "Scan Widgets"
         Me.btnWidgets.UseVisualStyleBackColor = True
         '
-        'tv2
+        'tvWidgetList
         '
-        Me.tv2.Location = New System.Drawing.Point(12, 609)
-        Me.tv2.Name = "tv2"
-        Me.tv2.Size = New System.Drawing.Size(596, 415)
-        Me.tv2.TabIndex = 7
+        Me.tvWidgetList.Location = New System.Drawing.Point(12, 609)
+        Me.tvWidgetList.Name = "tvWidgetList"
+        Me.tvWidgetList.Size = New System.Drawing.Size(596, 415)
+        Me.tvWidgetList.TabIndex = 7
         '
         'TabControl1
         '
@@ -243,7 +243,7 @@ Partial Class frmTester
         Me.btnTest.Name = "btnTest"
         Me.btnTest.Size = New System.Drawing.Size(147, 65)
         Me.btnTest.TabIndex = 13
-        Me.btnTest.Text = "test"
+        Me.btnTest.Text = "write Template"
         Me.btnTest.UseVisualStyleBackColor = True
         '
         'Button1
@@ -252,7 +252,7 @@ Partial Class frmTester
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(147, 65)
         Me.Button1.TabIndex = 14
-        Me.Button1.Text = "test"
+        Me.Button1.Text = "Read Template"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'frmTester
@@ -267,7 +267,7 @@ Partial Class frmTester
         Me.Controls.Add(Me.btnReadWidgets)
         Me.Controls.Add(Me.btnLoadPage)
         Me.Controls.Add(Me.TabControl1)
-        Me.Controls.Add(Me.tv2)
+        Me.Controls.Add(Me.tvWidgetList)
         Me.Controls.Add(Me.btnWidgets)
         Me.Controls.Add(Me.btnWriteWidgets)
         Me.Controls.Add(Me.btnScan)
@@ -292,7 +292,7 @@ Partial Class frmTester
     Friend WithEvents pg1 As PropertyGrid
     Friend WithEvents btnWriteWidgets As Button
     Friend WithEvents btnWidgets As Button
-    Friend WithEvents tv2 As TreeView
+    Friend WithEvents tvWidgetList As TreeView
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPage1 As TabPage
     Friend WithEvents tv3 As TreeView

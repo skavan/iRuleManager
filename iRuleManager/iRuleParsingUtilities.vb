@@ -20,25 +20,6 @@ Namespace Manager
         Public Sub SetLeftPanel(lhp As Div)
             _leftPanel = lhp
         End Sub
-        '// the basic info class
-        <Serializable>
-        Public Class IRuleBasicItemInfo
-            Private _base64Data1 As String
-            Property Name As String
-            Property Type As String
-            Property ImageSrc As String
-            Property GUID As String
-            Property Level As Integer
-
-            Public Function Base64Data() As String
-                Dim leftPos As Integer = ImageSrc.IndexOf("base64,") + 7
-                If leftPos > 0 Then
-                    Return ImageSrc.Substring(leftPos)
-                Else
-                    Return ""
-                End If
-            End Function
-        End Class
 
         '// a structure for managing ScanFilters
         Public Structure iRuleScanFilter
@@ -139,7 +120,10 @@ Namespace Manager
             For Each filter As iRuleScanFilter In filters
                 Select Case filter.Type
                     Case eTreeSearchOptions.ExcludeGroup
-                        If itemInfo.Level = 1 Then
+                        If itemInfo.Name = "Actions" Then
+                            Debug.Print("")
+                        End If
+                        If itemInfo.Level = 0 Then
                             For Each value In filter.Value.Split("|")
                                 If itemInfo.Name = value Then Return False
                             Next
@@ -343,7 +327,7 @@ Namespace Manager
                 Case "INPUT"
                     fldValue = childEl.Text
                 Case "SELECT"
-                    fldValue = childEl.Text
+                    fldValue = childEl.GetAttributeValue("value")
                 Case "DIV" '(could be font structure or variable structure)
                     '//div1 class="gwt-HTML variable"
                     '//div2 class="gwt-Label"
@@ -424,6 +408,7 @@ Namespace Manager
 
             End Select
         End Sub
+
         Public Function GetSplitValueItem(splitValue As String, elementNumber As Integer, bCleanString As Boolean) As String
             If splitValue.Contains("|") Then
                 Dim item As String = splitValue.Split("|")(elementNumber)
@@ -479,6 +464,7 @@ Namespace Manager
             End If
         End Sub
 
+
         Private Function ReadItemPropertiesOLD(itemInfo As IRuleBasicItemInfo) As List(Of KeyValuePair(Of String, String))
             '// long winded -- but only want to refresh tableProps if we have to.
             If _tableProps IsNot Nothing Then
@@ -514,6 +500,7 @@ Namespace Manager
             Next
             Return lstKVP
         End Function
+
         '// Get the properties table
         Private Function GetTableProps(leftPanel As Div) As Table
             For Each subDiv As Div In leftPanel.Children

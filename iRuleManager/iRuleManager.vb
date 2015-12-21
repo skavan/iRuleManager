@@ -17,6 +17,7 @@ Namespace Manager
         Property PageNodeTree As MyTreeNode
         Property WidgetTree As MyTreeNode
         Property imageList As New ImageList
+        Property iRuleURL As String = "https://builder.iruleathome.com/iRule.html#main"
 
         Property Device As New iRuleDevice
         Property Panel As New iRulePanel
@@ -35,7 +36,7 @@ Namespace Manager
         Private rightTree As Div = Nothing      '// should be grabbed after section is selected
         Private rightTabs As Div = Nothing
         Private rightCollapseAll As Image = Nothing
-
+        Private _isConnected As Boolean = False
         Private expandImage As String   '// the style of the expandImageIcon
 #End Region
 
@@ -47,9 +48,36 @@ Namespace Manager
             Return WidgetListByName.Keys.ToArray
         End Function
 
-        Public Sub New(url As String)
-            InitializeSystem(url)
+#Region "Initialization & Cleanup"
+        Public Sub New()
+
         End Sub
+
+        Public Sub New(url As String)
+            _isConnected = InitializeSystem(url)
+        End Sub
+
+        '// get the basics!
+        Private Function InitializeSystem(url As String) As Boolean
+            '// attach to existing iRule Internet Explorer Instance
+            ie = IE.AttachTo(Of IE)(Find.ByUrl(url), 5)
+            ie.AutoClose = False
+
+            '// lets get the whole leftHandPanel including the property panel
+            leftPanel = ie.Divs.Filter(Find.ByClass("gwt-SplitLayoutPanel")).First
+            '// there are multiple gwt-Tree's -- lets only get the first.
+            leftTree = GetChildDivByClassName(leftPanel, "irule-TabBottomPanel irule-HandsetsManagerView")
+
+            '// get the right hand area (including top tabs)
+            rightPanel = ie.Divs.Filter(Find.ByClass("gwt-TabLayoutPanel")).First
+
+            rightTabs = rightPanel.Divs.Filter(Find.ByClass("gwt-TabLayoutPanelTabs")).First
+            Debug.Print("Initialization Complete")
+            'ExecutePopupMenu(ie, leftHandPanel, "Collapse All")
+            Return True
+        End Function
+#End Region
+
 
 #Region "Prior Art"
         Public Sub Scan(scanLevel As eScanLevel)
@@ -88,25 +116,6 @@ Namespace Manager
 
 #End Region
 
-        '// get the basics!
-        Private Sub InitializeSystem(url As String)
-            '// attach to existing iRule Internet Explorer Instance
-            ie = IE.AttachTo(Of IE)(Find.ByUrl(url), 5)
-            ie.AutoClose = False
-
-            '// lets get the whole leftHandPanel including the property panel
-            leftPanel = ie.Divs.Filter(Find.ByClass("gwt-SplitLayoutPanel")).First
-            '// there are multiple gwt-Tree's -- lets only get the first.
-            leftTree = GetChildDivByClassName(leftPanel, "irule-TabBottomPanel irule-HandsetsManagerView")
-
-            '// get the right hand area (including top tabs)
-            rightPanel = ie.Divs.Filter(Find.ByClass("gwt-TabLayoutPanel")).First
-
-            rightTabs = rightPanel.Divs.Filter(Find.ByClass("gwt-TabLayoutPanelTabs")).First
-            Debug.Print("Initialization Complete")
-            'ExecutePopupMenu(ie, leftHandPanel, "Collapse All")
-
-        End Sub
 
 #Region "Scanning Functions"
         '// Test version
@@ -130,6 +139,7 @@ Namespace Manager
 
         '// execution version to scan a device Tree
         Public Sub ScanDeviceTree(title As String, bDoDeepScan As Boolean, filters As iRuleScanFilter())
+            If Not _isConnected Then _isConnected = InitializeSystem(iRuleURL)
             '// collapse everything so we know our beginning state
             leftCollapseAll = FindActiveImageByTitleName(leftPanel, "Collapse All")
             leftCollapseAll.UIEvent("click")
@@ -155,6 +165,7 @@ Namespace Manager
         End Sub
 
         Public Sub ScanWidgetTree(filters As iRuleScanFilter())
+            If Not _isConnected Then _isConnected = InitializeSystem(iRuleURL)
             '// Select the more tab at the head of the right Tree
             Dim widgetTab As Div = FindDivContainingText(rightTabs, "MORE")
             SelectAndClickElement(widgetTab)
@@ -190,17 +201,9 @@ Namespace Manager
             WidgetListByName = AppendWidgetBasedOn(WidgetListByName, "Browser", "Launch Browser")
         End Sub
 
-        Public Sub WriteWidgetListsToFile()
-            WriteToFile("G:\WidgetListByName.xml", WidgetListByName)
-            WriteToFile("G:\WidgetListByHash.xml", WidgetListByHash)
-        End Sub
 
-        Public Function ReadWidgetListsFromFile() As Boolean
-            WidgetListByName = ReadFromFile("G:\WidgetListByName.xml")
-            WidgetListByHash = ReadFromFile("G:\WidgetListByHash.xml")
-            WidgetTree = FillTree()
-            Return True
-        End Function
+
+
 
         Public Function FillTree() As MyTreeNode
             Dim node As New MyTreeNode("Loaded Widgets")
@@ -255,6 +258,7 @@ Namespace Manager
         '// create master image list and clean up type tages in the tree.
         Private Sub ProcessImageList(tree As MyTreeNode, isLeftTree As Boolean)
             For Each node As MyTreeNode In tree.Nodes
+
                 '// get the image HTML string
                 Dim src As String = node.BasicInfo.ImageSrc
                 Dim hashKey As String = ""
@@ -312,13 +316,16 @@ Namespace Manager
         End Sub
 
         Public Sub GoToElement(node As MyTreeNode)
-            FindElement(leftTree, node.BasicInfo.GUID, True)
+            If _isConnected Then
+                FindElement(leftTree, node.BasicInfo.GUID, True)
+            End If
+
             'ChangeElementData(leftTree, node.BasicInfo.GUID)
         End Sub
+
         Public Sub WriteToElement(node As MyTreeNode)
             Dim myDic As Dictionary(Of String, String) = node.Data
             If myDic IsNot Nothing Then
-                
                 Dim current As String = GetSplitValueItem(myDic("name"), 1, True)
                 myDic("name") = SetSplitValueItem(myDic("name"), 1, current & "XX", {"[", "]"})
                 FindElement(leftTree, node.BasicInfo.GUID, True)
@@ -327,9 +334,34 @@ Namespace Manager
             End If
         End Sub
         Public Sub Cleanup()
-            ie.Dispose()
+
+            If ie IsNot Nothing Then
+                ie.Dispose()
+            End If
         End Sub
 
+        Public Sub WriteWidgetListsToFile(node As MyTreeNode)
+            WriteiRuleTemplate(node, "G:\widgets.xml")
+            'WriteDictionaryToFile("G:\WidgetListByName.xml", WidgetListByName)
+            'WriteDictionaryToFile("G:\WidgetListByHash.xml", WidgetListByHash)
+        End Sub
+
+        Public Function ReadWidgetListsFromFile() As Boolean
+            'WidgetListByName = ReadDictionaryFromFile("G:\WidgetListByName.xml")
+            'WidgetListByHash = ReadDictionaryFromFile("G:\WidgetListByHash.xml")
+            'WidgetTree = FillTree()
+            WidgetTree = ReadiRuleTemplate("G:\widgets.xml")
+            ProcessImageList(WidgetTree, False)
+            Return True
+        End Function
+
+        Public Sub WriteToTemplate(node As MyTreeNode)
+            WriteiRuleTemplate(node, "G:\template.xml")
+        End Sub
+        Public Sub ReadFromtemplate()
+            PageTree = ReadiRuleTemplate("G:\template.xml")
+            ProcessImageList(PageTree, True)
+        End Sub
     End Class
 
 End Namespace
