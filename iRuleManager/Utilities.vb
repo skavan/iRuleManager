@@ -8,6 +8,14 @@ Namespace Manager
 
     Public Module Utilities
         '// the basic info class
+        Public Enum eTreeLevel
+            Handset = 0
+            Panel = 1
+            Group = 2
+            GroupItem = 3
+            Page = 3
+            Widget = 4
+        End Enum
         <Serializable>
         Public Class IRuleBasicItemInfo
             Private _base64Data1 As String
@@ -15,7 +23,7 @@ Namespace Manager
             Property Type As String
             Property ImageSrc As String
             Property GUID As String
-            Property Level As Integer
+            Property Level As New Collection
 
             Public Function Base64Data() As String
                 Dim leftPos As Integer = ImageSrc.IndexOf("base64,") + 7

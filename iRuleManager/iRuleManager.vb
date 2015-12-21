@@ -146,12 +146,17 @@ Namespace Manager
             '//bDoDeepScan = True '//TEMPORARY
             Dim leftBody = FindActiveDivByClassName(leftPanel, "irule-GwtPanelBody")
             leftTree = leftBody.Divs.Filter(Find.ByClass("gwt-Tree")).First
+
             If bDoDeepScan Then
                 SetLeftPanel(leftPanel)
-                PageTree = ParseTree(leftTree, New MyTreeNode(title), 0, bDoDeepScan, filters)
+                Dim rootNode As MyTreeNode = GetHandsetNode(leftPanel, True)
+                If rootNode Is Nothing Then Exit Sub
+                PageTree = ParseTree(leftTree, rootNode, 0, bDoDeepScan, filters)
                 ProcessImageList(PageTree, True)
             Else
-                NodeTree = ParseTree(leftTree, New MyTreeNode(title), 0, bDoDeepScan, filters)
+                Dim rootNode As MyTreeNode = GetHandsetNode(leftPanel, False)
+                If rootNode Is Nothing Then Exit Sub
+                NodeTree = ParseTree(leftTree, rootNode, 0, bDoDeepScan, filters)
                 ProcessImageList(NodeTree, True)
             End If     '// need to set the reference for deep scans.
 

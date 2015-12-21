@@ -21,6 +21,7 @@ Namespace Manager
             _leftPanel = lhp
         End Sub
 
+#Region "Tree Scanning Functions"
         '// a structure for managing ScanFilters
         Public Structure iRuleScanFilter
             Public Type As eTreeSearchOptions
@@ -162,6 +163,44 @@ Namespace Manager
             Return itemInfo
         End Function
 
+        '// Build the filters used to optimize Tree Scanning
+        Public Function BuildScanFilters(panel As String, group As String, excludegroup As String, page As String, level As Integer) As iRuleScanFilter()
+            Dim filters(-1) As iRuleScanFilter
+            If panel <> "" Then     '// i.e. Main
+                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToPanel, panel)
+                filters.Add(filter)
+            End If
+            If group <> "" Then     '// i.e. Landscape Pages
+                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToGroup, group)
+                filters.Add(filter)
+            End If
+            If excludegroup <> "" Then      '// i.e. Home
+                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.ExcludeGroup, excludegroup)
+                filters.Add(filter)
+            End If
+            If page <> "" Then      '// i.e. Home
+                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToPage, page)
+                filters.Add(filter)
+            End If
+            If level > 0 Then       '// i.e. 4
+                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.StopAtLevel, level)
+                filters.Add(filter)
+            End If
+            Return filters
+        End Function
+
+        '// convenience overload
+        Public Function BuildScanFilters(excludegroup As String, level As Integer) As iRuleScanFilter()
+            Return BuildScanFilters("", "", excludegroup, "", level)
+        End Function
+
+        '// Build the filters used to optimize Tree Scanning
+        Public Function BuildScanFilters(panel As String, group As String, page As String, level As Integer) As iRuleScanFilter()
+            Return BuildScanFilters(panel, group, "", page, level)
+        End Function
+
+#End Region
+
         '// Note the rootNode is by Ref and gets updated that way. The new node is returned.
         '// We also assign a GUID if a unique ID is not present. We also push the basicInfo into the MyTreeNode
         Private Function AddNodeWithGUID(ByRef nodeDiv As Div, ByRef rootNode As MyTreeNode, ByRef itemInfo As IRuleBasicItemInfo, bAssignGUID As Boolean) As MyTreeNode
@@ -209,42 +248,6 @@ Namespace Manager
             Return dest
         End Function
 
-        '// Build the filters used to optimize Tree Scanning
-        Public Function BuildScanFilters(panel As String, group As String, excludegroup As String, page As String, level As Integer) As iRuleScanFilter()
-            Dim filters(-1) As iRuleScanFilter
-            If panel <> "" Then     '// i.e. Main
-                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToPanel, panel)
-                filters.Add(filter)
-            End If
-            If group <> "" Then     '// i.e. Landscape Pages
-                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToGroup, group)
-                filters.Add(filter)
-            End If
-            If excludegroup <> "" Then      '// i.e. Home
-                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.ExcludeGroup, excludegroup)
-                filters.Add(filter)
-            End If
-            If page <> "" Then      '// i.e. Home
-                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.RestrictToPage, page)
-                filters.Add(filter)
-            End If
-            If level > 0 Then       '// i.e. 4
-                Dim filter As iRuleScanFilter = New iRuleScanFilter(eTreeSearchOptions.StopAtLevel, level)
-                filters.Add(filter)
-            End If
-            Return filters
-        End Function
-
-        '// convenience overload
-        Public Function BuildScanFilters(excludegroup As String, level As Integer) As iRuleScanFilter()
-            Return BuildScanFilters("", "", excludegroup, "", level)
-        End Function
-
-        '// Build the filters used to optimize Tree Scanning
-        Public Function BuildScanFilters(panel As String, group As String, page As String, level As Integer) As iRuleScanFilter()
-            Return BuildScanFilters(panel, group, "", page, level)
-        End Function
-
         '// Append a widget name to the specified dictionary and return the updated set
         Public Function AppendWidgetBasedOn(widgetListByName As Dictionary(Of String, IRuleBasicItemInfo), sourcename As String, targetname As String) As Dictionary(Of String, IRuleBasicItemInfo)
             '// get a deep clone of a button.
@@ -262,6 +265,11 @@ Namespace Manager
                 If potentialDiv.Exists Then Return potentialDiv
             Next
             Return Nothing
+        End Function
+
+        Function FindTableByClassName(parentDiv As Div, className As String) As Table
+            Dim foundTable As Table = parentDiv.Tables.Filter(Find.ByClass(className)).First
+            Return foundTable
         End Function
 
         '// scan the relevant element and look for a non-hidden icon
@@ -464,43 +472,6 @@ Namespace Manager
             End If
         End Sub
 
-
-        Private Function ReadItemPropertiesOLD(itemInfo As IRuleBasicItemInfo) As List(Of KeyValuePair(Of String, String))
-            '// long winded -- but only want to refresh tableProps if we have to.
-            If _tableProps IsNot Nothing Then
-                If _tableProps.Exists = False Then
-                    _tableProps = GetTableProps(_leftPanel)
-                End If
-            Else
-                _tableProps = GetTableProps(_leftPanel)
-            End If
-            Dim lstKVP As New List(Of KeyValuePair(Of String, String))
-            lstKVP.Add(New KeyValuePair(Of String, String)("itemName", itemInfo.Name))
-            lstKVP.Add(New KeyValuePair(Of String, String)("itemType", itemInfo.Type))
-            'lstKVP.Add(New KeyValuePair(Of String, String)("itemMacro", itemInfo.XtraInfo))
-            'lstKVP.Add(New KeyValuePair(Of String, String)("itemParentPanel", itemInfo.ParentPanel))
-            lstKVP.Add(New KeyValuePair(Of String, String)("itemID", itemInfo.GUID))
-
-            For Each tableRow As TableRow In _tableProps.TableRows
-                Dim nameCell = tableRow.TableCell(Find.ByClass("nameCell"))
-                Dim valueCell = tableRow.TableCell(Find.ByClass("valueCell"))
-                Dim nameDiv As Div = nameCell.Children(0)
-                '// inspect the div, because the div we want might be nested, one level down
-                If nameDiv.Children.Count > 0 Then
-                    nameDiv = nameDiv.Children(0)
-                End If
-                '// now get the name of the field
-                Dim fldName As String = nameDiv.InnerHtml
-                Dim fldValue As String = valueCell.Children(0).Title
-                If fldValue = "" Then
-                    fldValue = valueCell.Children(0).GetAttributeValue("value")
-                End If
-                Dim kvp As New KeyValuePair(Of String, String)(fldName, fldValue)
-                lstKVP.Add(kvp)
-            Next
-            Return lstKVP
-        End Function
-
         '// Get the properties table
         Private Function GetTableProps(leftPanel As Div) As Table
             For Each subDiv As Div In leftPanel.Children
@@ -530,6 +501,7 @@ Namespace Manager
         Public Function FindElement(source As Div, id As String, doClick As Boolean) As Div
             '// we need to find the element, 
             '// we need a function to walk up the tree And open the page
+            If id Is Nothing Then Return Nothing
             Dim targetElement As Div = source.Div(id)
             Dim targetTable As Table = targetElement.Tables(0)
 
@@ -664,7 +636,6 @@ Namespace Manager
 
         End Function
 
-
         Public Function GetPopupMenu(ie As DomContainer) As Table
             'The popupMenu is added as the final DIV of the body of the page
             Dim popupMenu As Div = ie.Body.Children.Last
@@ -673,6 +644,24 @@ Namespace Manager
             '// no wgrab the Table containing the popup menu and find the target cell that we need to click.
             Return popupMenu.Tables.First
 
+        End Function
+
+        Public Function GetHandsetNode(leftPanel As Div, bDoDeepScan As Boolean) As MyTreeNode
+            _leftPanel = leftPanel
+            Dim handsetTable As Table = FindTableByClassName(_leftPanel, "irule-HandsetsManagerViewElementItem")
+
+            If handsetTable.Exists = False Then
+                Return Nothing
+            End If
+            handsetTable.UIEvent("mousedown")
+            Dim node As New MyTreeNode(handsetTable.Title)
+            Dim itemInfo As New IRuleBasicItemInfo
+            itemInfo.Name = handsetTable.Title
+            itemInfo.Type = "Handset"
+            itemInfo.Level = 0
+            node.BasicInfo = itemInfo
+            If bDoDeepScan Then node.Data = ReadItemProperties(itemInfo)
+            Return node
         End Function
     End Module
 
