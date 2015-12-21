@@ -97,6 +97,12 @@
     <Compile Include="frmProgress.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmProgressIndicator.Designer.vb">
+      <DependentUpon>frmProgressIndicator.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmProgressIndicator.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmTester.Designer.vb">
       <DependentUpon>frmTester.vb</DependentUpon>
     </Compile>
@@ -134,6 +140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmProgress.resx">
       <DependentUpon>frmProgress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmProgressIndicator.resx">
+      <DependentUpon>frmProgressIndicator.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTester.resx">
       <DependentUpon>frmTester.vb</DependentUpon>

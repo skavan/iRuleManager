@@ -20,6 +20,15 @@ Public Module MyWatinExtensions
     End Sub
 
     <System.Runtime.CompilerServices.Extension>
+    Public Sub PressEnter(textField As TextField)
+        SetForegroundWindow(textField.DomContainer.hWnd)
+        SetFocus(textField.DomContainer.hWnd)
+        textField.Focus()
+        System.Windows.Forms.SendKeys.SendWait("{ENTER}")
+        Thread.Sleep(1000)
+    End Sub
+
+    <System.Runtime.CompilerServices.Extension>
     Public Sub UIEvent(imageField As TextField)
         SetForegroundWindow(imageField.DomContainer.hWnd)
         SetFocus(imageField.DomContainer.hWnd)
@@ -30,6 +39,7 @@ Public Module MyWatinExtensions
 
     <System.Runtime.CompilerServices.Extension>
     Public Sub UIEvent(elem As Element, eventName As String, Optional button As Integer = 0)
+
         'SetForegroundWindow(elem.DomContainer.hWnd)
         'SetFocus(elem.DomContainer.hWnd)
         DispatchMouseEvent(elem, eventName, button)
@@ -45,6 +55,9 @@ Public Module MyWatinExtensions
         '// use a dispatchevent rather than a fire event.
         '// is it a mousevent or an HTML event?
         Select Case eventname
+            Case "change"
+                script.Append("var sevt = document.createEvent('HTMLEvents');")
+                script.Append("sevt.initEvent('" & eventname & "',true, false);")
             Case "contextmenu"
                 script.Append("var sevt = document.createEvent('HTMLEvents');")
                 script.Append("sevt.initEvent('" & eventname & "',true, false);")

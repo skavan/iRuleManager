@@ -313,8 +313,19 @@ Namespace Manager
 
         Public Sub GoToElement(node As MyTreeNode)
             FindElement(leftTree, node.BasicInfo.GUID, True)
+            'ChangeElementData(leftTree, node.BasicInfo.GUID)
         End Sub
-
+        Public Sub WriteToElement(node As MyTreeNode)
+            Dim myDic As Dictionary(Of String, String) = node.Data
+            If myDic IsNot Nothing Then
+                
+                Dim current As String = GetSplitValueItem(myDic("name"), 1, True)
+                myDic("name") = SetSplitValueItem(myDic("name"), 1, current & "XX", {"[", "]"})
+                FindElement(leftTree, node.BasicInfo.GUID, True)
+                UpdatePropertyTable(leftTree, node)
+                node.Text = myDic("name")
+            End If
+        End Sub
         Public Sub Cleanup()
             ie.Dispose()
         End Sub

@@ -41,7 +41,7 @@ Partial Class frmProgress
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(482, 162)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(482, 163)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(5, 7, 5, 7)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -77,8 +77,9 @@ Partial Class frmProgress
         Me.Panel1.Controls.Add(Me.PictureBox1)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
+        Me.Panel1.MaximumSize = New System.Drawing.Size(764, 160)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(764, 159)
+        Me.Panel1.Size = New System.Drawing.Size(764, 160)
         Me.Panel1.TabIndex = 1
         '
         'lblProgress
@@ -98,19 +99,21 @@ Partial Class frmProgress
         Me.PictureBox1.Image = Global.iRuleManager.My.Resources.Resources.image_930721
         Me.PictureBox1.InitialImage = Global.iRuleManager.My.Resources.Resources.image_930721
         Me.PictureBox1.Location = New System.Drawing.Point(12, 16)
+        Me.PictureBox1.MaximumSize = New System.Drawing.Size(128, 128)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(128, 128)
-        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
         '
         'frmProgress
         '
         Me.AcceptButton = Me.OK_Button
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 28.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(144.0!, 144.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(764, 227)
+        Me.ClientSize = New System.Drawing.Size(764, 228)
         Me.ControlBox = False
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -119,6 +122,7 @@ Partial Class frmProgress
         Me.Margin = New System.Windows.Forms.Padding(5, 7, 5, 7)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
+        Me.MinimumSize = New System.Drawing.Size(0, 265)
         Me.Name = "frmProgress"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent

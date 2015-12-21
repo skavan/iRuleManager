@@ -31,19 +31,22 @@ Partial Class frmTester
         Me.btnWidgets = New System.Windows.Forms.Button()
         Me.tv2 = New System.Windows.Forms.TreeView()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.tv3 = New System.Windows.Forms.TreeView()
-        Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.btnLoadPage = New System.Windows.Forms.Button()
         Me.btnReadWidgets = New System.Windows.Forms.Button()
         Me.tbDeviceTree = New System.Windows.Forms.TabControl()
         Me.tbPage1 = New System.Windows.Forms.TabPage()
         Me.tbPage2 = New System.Windows.Forms.TabPage()
         Me.tvPage = New System.Windows.Forms.TreeView()
+        Me.btnWrite = New System.Windows.Forms.Button()
+        Me.btnTest = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.dg1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
         Me.tbDeviceTree.SuspendLayout()
         Me.tbPage1.SuspendLayout()
         Me.tbPage2.SuspendLayout()
@@ -80,20 +83,22 @@ Partial Class frmTester
         '
         Me.dg1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dg1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dg1.Location = New System.Drawing.Point(6, 402)
+        Me.dg1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.dg1.Location = New System.Drawing.Point(3, 482)
         Me.dg1.Name = "dg1"
         Me.dg1.RowHeadersVisible = False
         Me.dg1.RowTemplate.Height = 28
-        Me.dg1.Size = New System.Drawing.Size(593, 413)
+        Me.dg1.Size = New System.Drawing.Size(590, 245)
         Me.dg1.TabIndex = 3
         '
         'pg1
         '
         Me.pg1.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.pg1.Dock = System.Windows.Forms.DockStyle.Top
         Me.pg1.HelpVisible = False
-        Me.pg1.Location = New System.Drawing.Point(6, 6)
+        Me.pg1.Location = New System.Drawing.Point(3, 3)
         Me.pg1.Name = "pg1"
-        Me.pg1.Size = New System.Drawing.Size(593, 383)
+        Me.pg1.Size = New System.Drawing.Size(590, 473)
         Me.pg1.TabIndex = 4
         Me.pg1.ToolbarVisible = False
         '
@@ -124,13 +129,28 @@ Partial Class frmTester
         '
         'TabControl1
         '
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Location = New System.Drawing.Point(622, 178)
+        Me.TabControl1.Location = New System.Drawing.Point(622, 260)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(604, 845)
+        Me.TabControl1.Size = New System.Drawing.Size(604, 763)
         Me.TabControl1.TabIndex = 8
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.pg1)
+        Me.TabPage2.Controls.Add(Me.dg1)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(596, 730)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Properties"
+        Me.TabPage2.UseVisualStyleBackColor = True
         '
         'TabPage1
         '
@@ -138,7 +158,7 @@ Partial Class frmTester
         Me.TabPage1.Location = New System.Drawing.Point(4, 29)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(596, 812)
+        Me.TabPage1.Size = New System.Drawing.Size(596, 730)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "TabPage1"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -149,18 +169,6 @@ Partial Class frmTester
         Me.tv3.Name = "tv3"
         Me.tv3.Size = New System.Drawing.Size(586, 809)
         Me.tv3.TabIndex = 0
-        '
-        'TabPage2
-        '
-        Me.TabPage2.Controls.Add(Me.pg1)
-        Me.TabPage2.Controls.Add(Me.dg1)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 29)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(596, 812)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Properties"
-        Me.TabPage2.UseVisualStyleBackColor = True
         '
         'btnLoadPage
         '
@@ -220,11 +228,41 @@ Partial Class frmTester
         Me.tvPage.Size = New System.Drawing.Size(580, 552)
         Me.tvPage.TabIndex = 3
         '
+        'btnWrite
+        '
+        Me.btnWrite.Location = New System.Drawing.Point(1079, 83)
+        Me.btnWrite.Name = "btnWrite"
+        Me.btnWrite.Size = New System.Drawing.Size(147, 65)
+        Me.btnWrite.TabIndex = 12
+        Me.btnWrite.Text = "TestWrite"
+        Me.btnWrite.UseVisualStyleBackColor = True
+        '
+        'btnTest
+        '
+        Me.btnTest.Location = New System.Drawing.Point(773, 154)
+        Me.btnTest.Name = "btnTest"
+        Me.btnTest.Size = New System.Drawing.Size(147, 65)
+        Me.btnTest.TabIndex = 13
+        Me.btnTest.Text = "test"
+        Me.btnTest.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(926, 154)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(147, 65)
+        Me.Button1.TabIndex = 14
+        Me.Button1.Text = "test"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'frmTester
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1237, 1036)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.btnTest)
+        Me.Controls.Add(Me.btnWrite)
         Me.Controls.Add(Me.tbDeviceTree)
         Me.Controls.Add(Me.btnReadWidgets)
         Me.Controls.Add(Me.btnLoadPage)
@@ -238,8 +276,8 @@ Partial Class frmTester
         Me.Text = "frmTester"
         CType(Me.dg1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
         Me.tbDeviceTree.ResumeLayout(False)
         Me.tbPage1.ResumeLayout(False)
         Me.tbPage2.ResumeLayout(False)
@@ -265,4 +303,7 @@ Partial Class frmTester
     Friend WithEvents tbPage1 As TabPage
     Friend WithEvents tbPage2 As TabPage
     Friend WithEvents tvPage As TreeView
+    Friend WithEvents btnWrite As Button
+    Friend WithEvents btnTest As Button
+    Friend WithEvents Button1 As Button
 End Class

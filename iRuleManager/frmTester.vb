@@ -1,23 +1,49 @@
 ﻿Imports System.ComponentModel
+Imports System.Runtime.InteropServices
+Imports System.Threading
 Imports iRuleManager.Manager
 
 Public Class frmTester
 
     Dim iRule As Scraper
     Dim ST As New Stopwatch
+    Dim _thread As Thread
+    Dim _progressForm As frmProgressIndicator
 
-    Private Sub ShowProgress(message As String, bKill As Boolean)
-        If bKill Then
-            frmProgress.Enabled = False
-            frmProgress.Visible = False
-            Me.BringToFront()
-        Else
-            frmProgress.Visible = True
-            frmProgress.Enabled = True
-            frmProgress.DisplayText(message)
-            frmProgress.BringToFront()
+    Private Sub CreateProgressForm()
+        If _thread Is Nothing Then
+            _thread = New Thread(Sub()
+                                     Using frm As New frmProgressIndicator
+                                         Application.Run(frm)
+                                         'frm.DisplayText(message)
+                                     End Using
+                                 End Sub)
+            _thread.Start()
+            Application.DoEvents()
+
         End If
     End Sub
+    Private Sub ShowProgress(message As String, bKill As Boolean)
+
+        If _progressForm Is Nothing Then
+            _progressForm = Application.OpenForms.OfType(Of frmProgressIndicator).First
+        End If
+
+        If bKill Then
+            _progressForm.HideMe()
+            'frmProgress.Enabled = False
+            'frmProgress.Visible = False
+            'Me.BringToFront()
+        Else
+            _progressForm.DisplayText(message)
+
+            'frmProgress.Visible = True
+            'frmProgress.Enabled = True
+            'frmProgress.DisplayText(message)
+            'frmProgress.BringToFront()
+        End If
+    End Sub
+
     Private Sub btnInit_Click(sender As Object, e As EventArgs) Handles btnInit.Click
 
         ShowProgress("Initializing System...", False)
@@ -65,7 +91,7 @@ Public Class frmTester
             iRule.Cleanup()
             iRule = Nothing
         End If
-
+        _progressForm.KillMe()
     End Sub
 
     Private Sub tvTree_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles tvTree.AfterSelect
@@ -93,6 +119,10 @@ Public Class frmTester
         Me.Left = 1200
         tvTree.ShowNodeToolTips = True
         tv2.ShowNodeToolTips = True
+        CreateProgressForm()
+
+        'ShowProgress("Loading...", True)
+
     End Sub
 
     Private Sub btnReadWidgets_Click(sender As Object, e As EventArgs) Handles btnReadWidgets.Click
@@ -139,4 +169,27 @@ Public Class frmTester
             pg1.SelectedObject = dic.ToArray
         End If
     End Sub
+
+    Private Sub btnWrite_Click(sender As Object, e As EventArgs) Handles btnWrite.Click
+        Dim node As MyTreeNode = tvPage.SelectedNode
+        If node.Data IsNot Nothing Then
+            'dg1.DataSource = node.Data.ValueCollection
+            iRule.WriteToElement(node)
+            Dim dic As Dictionary(Of String, String) = node.Data
+            pg1.SelectedObject = dic.ToArray
+        End If
+    End Sub
+
+    Private Sub btnTest_Click(sender As Object, e As EventArgs) Handles btnTest.Click
+
+
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        '_thread.Abort()
+        '_thread.Abort()
+    End Sub
+
+
 End Class
