@@ -23,7 +23,7 @@ Namespace Manager
             Property Type As String
             Property ImageSrc As String
             Property GUID As String
-            Property Level As New Collection
+            Property Level As eTreeLevel
 
             Public Function Base64Data() As String
                 Dim leftPos As Integer = ImageSrc.IndexOf("base64,") + 7

@@ -151,12 +151,12 @@ Namespace Manager
                 SetLeftPanel(leftPanel)
                 Dim rootNode As MyTreeNode = GetHandsetNode(leftPanel, True)
                 If rootNode Is Nothing Then Exit Sub
-                PageTree = ParseTree(leftTree, rootNode, 0, bDoDeepScan, filters)
+                PageTree = ParseTree(leftTree, rootNode, eTreeLevel.Panel, bDoDeepScan, filters)
                 ProcessImageList(PageTree, True)
             Else
                 Dim rootNode As MyTreeNode = GetHandsetNode(leftPanel, False)
                 If rootNode Is Nothing Then Exit Sub
-                NodeTree = ParseTree(leftTree, rootNode, 0, bDoDeepScan, filters)
+                NodeTree = ParseTree(leftTree, rootNode, eTreeLevel.Panel, bDoDeepScan, filters)
                 ProcessImageList(NodeTree, True)
             End If     '// need to set the reference for deep scans.
 
@@ -165,7 +165,7 @@ Namespace Manager
         End Sub
 
         Public Sub ScanWidgetTree()
-            Dim filters As iRuleScanFilter() = BuildScanFilters("Modules|Conditionals", 4)
+            Dim filters As iRuleScanFilter() = BuildScanFilters("Modules|Conditionals", eTreeLevel.Widget)
             ScanWidgetTree(filters)
         End Sub
 
@@ -191,7 +191,7 @@ Namespace Manager
 
             WidgetListByHash.Clear()
             WidgetListByName.Clear()
-            WidgetTree = ParseTree(rightTree, New MyTreeNode("LiveScan Widget Tree"), 0, False, filters)
+            WidgetTree = ParseTree(rightTree, New MyTreeNode("LiveScan Widget Tree"), (1 + 1), False, filters)
             ProcessImageList(WidgetTree, False)
             CleanupImageList()
 
@@ -212,8 +212,8 @@ Namespace Manager
 
         Public Function FillTree() As MyTreeNode
             Dim node As New MyTreeNode("Loaded Widgets")
-            Dim thisLevel As Integer = -1
-            Dim previousLevel As Integer = -1
+            Dim thisLevel As Integer = eTreeLevel.Handset
+            Dim previousLevel As Integer = eTreeLevel.Handset
             Dim currentNode As MyTreeNode = node
             For Each item As IRuleBasicItemInfo In WidgetListByName.Values
                 Dim thisNode As New MyTreeNode(item.Name)
@@ -281,7 +281,7 @@ Namespace Manager
                             End If
                         End If
                         If Not isLeftTree Then
-                            If node.BasicInfo.Level = 0 Then
+                            If node.BasicInfo.Level = (1 + 1) Then        '// 1+1=2 special case for widgets
                                 WidgetListByName.Add(node.BasicInfo.Name & " (" & node.BasicInfo.Type & ")", node.BasicInfo)
                             Else
                                 '// only add if the widget name is not already present!

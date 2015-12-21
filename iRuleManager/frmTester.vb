@@ -51,7 +51,7 @@ Public Class frmTester
     Private Sub btnScan_Click(sender As Object, e As EventArgs) Handles btnScan.Click
         ST.Start()
         ShowProgress("Scanning Device Tree...", False)
-        iRule.ScanDeviceTree("Device Tree", "Entrances|Motions|Gestures", 3)
+        iRule.ScanDeviceTree("Device Tree", "Entrances|Motions|Gestures", eTreeLevel.Page)
 
         If iRule.NodeTree IsNot Nothing Then
             tvTree.Nodes.Clear()

@@ -121,10 +121,10 @@ Namespace Manager
             For Each filter As iRuleScanFilter In filters
                 Select Case filter.Type
                     Case eTreeSearchOptions.ExcludeGroup
-                        If itemInfo.Name = "Actions" Then
+                        If itemInfo.Name = "Modules" Then
                             Debug.Print("")
                         End If
-                        If itemInfo.Level = 0 Then
+                        If itemInfo.Level = eTreeLevel.Group Then
                             For Each value In filter.Value.Split("|")
                                 If itemInfo.Name = value Then Return False
                             Next
@@ -132,19 +132,19 @@ Namespace Manager
                             Return True
                         End If
                     Case eTreeSearchOptions.RestrictToPanel
-                        If itemInfo.Level = 0 Then
+                        If itemInfo.Level = eTreeLevel.Panel Then
                             If itemInfo.Name = filter.Value Then Return True Else Return False
                         End If
                     Case eTreeSearchOptions.RestrictToGroup
-                        If itemInfo.Level = 1 Then
+                        If itemInfo.Level = eTreeLevel.Group Then
                             If itemInfo.Name = filter.Value Then Return True Else Return False
                         End If
                     Case eTreeSearchOptions.RestrictToPage
-                        If itemInfo.Level = 2 Then
+                        If itemInfo.Level = eTreeLevel.Page Then
                             If itemInfo.Name = filter.Value Then Return True Else Return False
                         End If
                     Case eTreeSearchOptions.StopAtLevel
-                        If itemInfo.Level = filter.Value Then Return False Else Return True
+                        If itemInfo.Level > filter.Value Then Return False Else Return True
                 End Select
             Next
             '// if we didn't hit any filter, return True
@@ -653,7 +653,7 @@ Namespace Manager
             If handsetTable.Exists = False Then
                 Return Nothing
             End If
-            handsetTable.UIEvent("mousedown")
+            handsetTable.UIEvent("click")
             Dim node As New MyTreeNode(handsetTable.Title)
             Dim itemInfo As New IRuleBasicItemInfo
             itemInfo.Name = handsetTable.Title
